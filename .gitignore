@@ -1,0 +1,24 @@
+# Entornos virtuales
+venv/
+.venv/
+env/
+
+# Archivos de Excel de prueba y datos de usuario local
+*.xlsx
+!.gitkeep
+
+# Caché de Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Archivos de entorno y claves
+.env
+.env.local
+echo ".ssh/" >> .gitignore
+echo "*.key" >> .gitignore
+echo ".env" >> .gitignore
+echo ".venv/" >> .gitignore
+
+# Archivos temporales de test
+test_*.xlsx
