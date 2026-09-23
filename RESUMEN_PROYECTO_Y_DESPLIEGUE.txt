@@ -1,0 +1,244 @@
+================================================================================
+  ESCÁNER DE RECIBOS Y GESTIÓN FINANCIERA — RESUMEN DEL PROYECTO
+  Fecha: Septiembre 2026
+================================================================================
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. ¿QUÉ ES ESTE PROYECTO?
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Aplicación web gratuita que permite:
+
+  • Tomar una foto de un recibo físico desde el celular (o subir imagen).
+  • Extraer automáticamente la información del recibo usando IA (Gemini).
+  • Revisar y editar los datos extraídos antes de guardarlos.
+  • Registrar el pago en un archivo Excel acumulativo (registro_pagos.xlsx).
+  • Generar un comprobante de pago en PDF listo para descargar.
+
+Costo total de operación: $0 (usando tiers gratuitos de Google AI y Streamlit).
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2. STACK TECNOLÓGICO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Capa              Tecnología
+  ────────────────  ──────────────────────────────────────────────────────────
+  Frontend/UI       Streamlit 1.64 — interfaz web + cámara móvil
+  Backend/Lógica    Python 3.11
+  Visión IA (OCR)   Google Gemini 2.5 Flash / 1.5 Flash (SDK: google-genai)
+  Base de datos     Pandas + openpyxl → archivo Excel .xlsx
+  Generador PDF     ReportLab 5.0
+  Despliegue        Streamlit Community Cloud (gratis, vinculado a GitHub)
+  Entorno local     Conda (entorno: FinTA)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3. LOGROS DEL PROYECTO (MÓDULOS COMPLETADOS)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  [OK] ocr_module.py
+     Módulo de visión artificial. Función analizar_recibo(imagen_bytes, api_key).
+     - Conecta con la API de Gemini usando el SDK google-genai.
+     - Prueba primero gemini-2.5-flash; si falla, usa gemini-1.5-flash (fallback).
+     - Fuerza respuesta JSON estructurado con 5 campos clave.
+     - Limpia bloques de markdown que el modelo a veces agrega.
+     - Maneja errores de red y de formato.
+
+  [OK] data_module.py
+     Módulo de registro en Excel. Funciones: limpiar_monto() y registrar_pago().
+     - Detecta y convierte formatos de moneda (americano: 1,234.56 y
+       europeo: 1.234,56) a número flotante limpio.
+     - Crea el archivo Excel si no existe, o agrega fila al existente.
+     - Usa openpyxl como motor para máxima compatibilidad.
+
+  [OK] pdf_module.py
+     Módulo generador de PDF. Función generar_comprobante_pdf(datos_json).
+     - Genera comprobante profesional en memoria (bytes) usando ReportLab.
+     - Diseño limpio: título centrado, tabla estilizada con colores corporativos,
+       pie de página con leyenda de validez.
+     - Retorna bytes directamente (listo para st.download_button).
+
+  [OK] app.py
+     Aplicación principal Streamlit integrada.
+     - Dos modos de entrada: Cámara móvil (st.camera_input) y subir imagen.
+     - Gestión de API Key desde la barra lateral o variable de entorno.
+     - Formulario editable para revisar los datos antes de confirmar.
+     - Botón de descarga de PDF y de Excel.
+     - Tabla histórica de pagos al pie de la página.
+
+  [OK] test_app.py
+     Suite de pruebas unitarias (unittest / pytest).
+     - test_limpiar_monto: Valida conversión de formatos de moneda.
+     - test_registrar_pago: Verifica creación y escritura del Excel.
+     - test_generar_pdf: Confirma que el PDF se genera y tiene contenido.
+     Estado: 3/3 PASSED
+
+  [OK] requirements.txt (corregido)
+     7 dependencias directas con versiones mínimas (limpio, sin pip freeze).
+
+  [OK] .gitignore (corregido)
+     Reglas válidas para proteger .env, claves, Excel local y entorno virtual.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4. CÓMO PROBAR LOCALMENTE (DESDE TU MÁQUINA)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Prerrequisito: tener el entorno conda FinTA activo.
+
+  Paso 1 — Activar entorno:
+    conda activate FinTA
+
+  Paso 2 — Ir al directorio del proyecto:
+    cd /home/gomsal/projects/FinanData
+
+  Paso 3 — Crear archivo .env con tu API Key (solo la primera vez):
+    echo 'GEMINI_API_KEY=tu_clave_aqui' > .env
+
+    (Obtén tu clave gratis en: https://aistudio.google.com/apikey)
+
+  Paso 4 — Ejecutar la aplicación:
+    conda run -n FinTA streamlit run app.py
+
+  Paso 5 — Abrir en el navegador:
+    Streamlit mostrará una URL local, típicamente:
+    → http://localhost:8501
+
+  Para probar la CÁMARA desde el teléfono en la red local:
+    Streamlit también mostrará una URL de red, por ejemplo:
+    → http://192.168.1.XX:8501
+    Abre ESA URL desde el navegador de tu celular (misma red WiFi).
+    La pestaña "Cámara Móvil" activará directamente tu cámara.
+
+    NOTA: Para que la cámara funcione en el navegador móvil, la conexión
+    DEBE ser HTTPS o localhost. Si usas la IP local (http://192.168.X.X),
+    algunos navegadores móviles pueden bloquear la cámara por seguridad.
+    La solución definitiva es el despliegue en Streamlit Cloud (ver sección 5).
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5. CÓMO DESPLEGAR EN STREAMLIT COMMUNITY CLOUD (GRATIS, CON HTTPS)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Este es el método recomendado para usar la cámara del celular sin restricciones,
+ya que Streamlit Cloud sirve la app con HTTPS (requerido por los navegadores
+móviles para acceder a la cámara).
+
+  PASO 1: Subir el código a GitHub
+  ─────────────────────────────────────────────────────────────────────────
+
+  1a. Crear repositorio en GitHub (puede ser privado):
+      Ve a https://github.com/new
+
+  1b. Inicializar y subir desde la terminal:
+      git init   (si no está inicializado)
+      git add app.py ocr_module.py data_module.py pdf_module.py
+      git add requirements.txt .gitignore README.md
+      git commit -m "Initial release: Escáner de Recibos v1"
+      git remote add origin https://github.com/TU_USUARIO/TU_REPO.git
+      git push -u origin main
+
+  Archivos que NO debes subir (ya están en .gitignore):
+      - .env
+      - .venv/ o cualquier entorno virtual
+      - *.xlsx (datos locales)
+      - secrets.toml
+
+  PASO 2: Conectar con Streamlit Community Cloud
+  ─────────────────────────────────────────────────────────────────────────
+
+  2a. Ve a: https://share.streamlit.io
+  2b. Haz clic en "Sign in" y conecta con tu cuenta de GitHub.
+  2c. Haz clic en "New app".
+  2d. Selecciona:
+        Repository:  TU_USUARIO/TU_REPO
+        Branch:      main
+        Main file:   app.py
+  2e. Haz clic en "Advanced settings" antes de desplegar.
+
+  PASO 3: Configurar la API Key como Secret (MUY IMPORTANTE)
+  ─────────────────────────────────────────────────────────────────────────
+
+  En la sección "Secrets" de Advanced Settings, agrega exactamente esto:
+
+      GEMINI_API_KEY = "tu_clave_de_gemini_aqui"
+
+  Esto evita que tu API Key quede expuesta en el código público.
+  La app la leerá automáticamente con os.environ.get("GEMINI_API_KEY").
+
+  PASO 4: Desplegar y obtener la URL pública
+  ─────────────────────────────────────────────────────────────────────────
+
+  4a. Haz clic en "Deploy!".
+  4b. Espera 1-3 minutos mientras Streamlit instala las dependencias.
+  4c. Obtendrás una URL pública con HTTPS, por ejemplo:
+        https://tu-usuario-tu-repo-app-py-xxxx.streamlit.app
+
+  4d. Abre esa URL desde el navegador de tu celular.
+      La pestaña "Cámara Móvil" pedirá permiso para acceder a la cámara.
+      Acepta el permiso → toma la foto del recibo → haz clic en "Analizar".
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+6. FLUJO DE USO DESDE EL CELULAR (PASO A PASO)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  1. Abre la URL de tu app en el navegador del celular.
+  2. (Opcional) Si no configuraste el Secret en Streamlit Cloud, ingresa tu
+     Gemini API Key en el menú lateral (icono de engranaje).
+  3. Selecciona la pestaña "Cámara Móvil".
+  4. Toca el botón de cámara → apunta al recibo físico → toma la foto.
+  5. Toca "Analizar Recibo con Gemini".
+  6. Espera unos segundos mientras la IA extrae los datos.
+  7. Revisa los campos extraídos en el formulario (puedes editarlos).
+  8. Toca "Confirmar y Registrar Pago" para guardar en Excel.
+  9. Descarga el "Comprobante PDF" o el "Registro Excel".
+ 10. Al fondo de la página verás el histórico acumulado de pagos.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+7. DATOS QUE EXTRAE LA IA DEL RECIBO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Campo                  Descripción
+  ─────────────────────  ──────────────────────────────────────────────────
+  fecha_pago             Fecha de la transacción (formato YYYY-MM-DD)
+  nombre_cliente         Nombre del cliente o pagador
+  monto_total            Monto numérico (sin símbolo de moneda)
+  concepto_pago          Descripción corta del servicio/producto pagado
+  numero_referencia      Folio, número de transacción o "N/A" si no existe
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+8. ESTRUCTURA DE ARCHIVOS DEL PROYECTO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  FinanData/
+  |── app.py                          <- Aplicación principal Streamlit
+  |── ocr_module.py                   <- Módulo de visión artificial (Gemini)
+  |── data_module.py                  <- Módulo de registro en Excel
+  |── pdf_module.py                   <- Módulo generador de PDF (ReportLab)
+  |── test_app.py                     <- Tests unitarios (3/3 PASSED)
+  |── requirements.txt                <- Dependencias del proyecto (7 paquetes)
+  |── .gitignore                      <- Exclusiones para Git
+  |── .env                            <- API Key local (NO subir a GitHub)
+  |── README.md                       <- Documentación del repositorio
+  └── plan_implementacion_app_recibos_v1.md  <- Plan de implementación
+
+  Archivos generados en tiempo de ejecución (ignorados por Git):
+  |── registro_pagos.xlsx             <- Base de datos acumulativa de pagos
+  └── comprobante_*.pdf               <- Comprobantes generados
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+9. RECURSOS Y LINKS ÚTILES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Obtener API Key de Gemini (gratis):
+    https://aistudio.google.com/apikey
+
+  Streamlit Community Cloud (despliegue gratis):
+    https://share.streamlit.io
+
+  Documentación google-genai SDK:
+    https://googleapis.github.io/python-genai/
+
+  Documentación Streamlit:
+    https://docs.streamlit.io
+
+================================================================================
+  Generado el: 2026-09-23 | Proyecto: FinanData / Escáner de Recibos v1
+================================================================================

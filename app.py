@@ -1,7 +1,9 @@
 import os
 import io
 import pandas as pd
+# pyrefly: ignore [missing-import]
 import streamlit as st
+# pyrefly: ignore [missing-import]
 from dotenv import load_dotenv
 
 # Cargar variables de entorno
@@ -46,7 +48,7 @@ EXCEL_PATH = "registro_pagos.xlsx"
 
 if imagen_bytes:
     st.subheader("1. Procesamiento y Extracción por IA")
-    st.image(imagen_bytes, caption="Imagen del recibo", use_column_width=True)
+    st.image(imagen_bytes, caption="Imagen del recibo", use_container_width=True)
 
     if st.button("🔍 Analizar Recibo con Gemini", type="primary"):
         if not api_key_input:

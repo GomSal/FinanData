@@ -1,0 +1,10 @@
+{
+    "mcpServers": {
+        "streamlit-helper": {
+            "command": "/home/gomsal/miniconda3/envs/FinTA/bin/python",
+            "args": [
+                "/home/gomsal/projects/FinanData/server.py"
+            ]
+        }
+    }
+}

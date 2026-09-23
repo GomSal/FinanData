@@ -9,7 +9,7 @@ La arquitectura recomendada utiliza herramientas de despliegue rápido y anális
 ## Arquitectura del Proyecto (Stack Tecnológico)
 *   **Frontend (Interfaz Móvil):** Streamlit (usando el widget `st.camera_input`).
 *   **Backend & Lógica:** Python.
-*   **Motor de Visión Artificial (OCR):** Gemini 1.5 Flash API (Tier gratuito vía Google AI Studio). 
+*   **Motor de Visión Artificial (OCR):** Gemini 2.5 Flash / 1.5 Flash API (Tier gratuito vía Google AI Studio). SDK: `google-genai`.
 *   **Base de Datos / Registro:** Pandas para estructuración de datos y `openpyxl` para escritura en Excel (`.xlsx`).
 *   **Generador de Comprobantes:** ReportLab (creación de `.pdf` formales).
 *   **Despliegue:** Streamlit Community Cloud (Alojamiento web 100% gratuito vinculado a Git).
@@ -20,7 +20,7 @@ La arquitectura recomendada utiliza herramientas de despliegue rápido y anális
 **Objetivo:** Preparar el entorno virtual y asegurar que las librerías necesarias estén instaladas.
 
 **Instrucción para el Agente de IA:**
-> "Actúa como un ingeniero de software experto en Python. Crea el archivo `requirements.txt` para un proyecto que utilizará Streamlit para la interfaz, el SDK de `google-generativeai` para visión artificial, `pandas` y `openpyxl` para manejar registros en Excel, y `reportlab` para generar PDFs. Dame también los comandos de terminal para crear un entorno virtual e instalar estas dependencias."
+> "Actúa como un ingeniero de software experto en Python. Crea el archivo `requirements.txt` para un proyecto que utilizará Streamlit para la interfaz, el SDK `google-genai` (SDK unificado de Google AI) para visión artificial, `pandas` y `openpyxl` para manejar registros en Excel, `reportlab` para generar PDFs, `pillow` para procesamiento de imágenes, y `python-dotenv` para gestión de variables de entorno. El archivo debe listar solo dependencias directas con versiones mínimas (sin pin exacto), para compatibilidad con Streamlit Community Cloud."
 
 ---
 
@@ -28,7 +28,7 @@ La arquitectura recomendada utiliza herramientas de despliegue rápido y anális
 **Objetivo:** Conectar la imagen capturada con el LLM multimodal para estructurar el texto del recibo en formato JSON.
 
 **Instrucción para el Agente de IA:**
-> "Escribe un módulo en Python usando el SDK `google.generativeai`. Crea una función llamada `analizar_recibo(imagen_bytes)` que reciba la imagen escaneada de un recibo. Usa el modelo `gemini-1.5-flash`. El prompt interno debe obligar al modelo a devolver ÚNICAMENTE un objeto JSON válido con las siguientes claves: `fecha_pago`, `nombre_cliente`, `monto_total`, `concepto_pago` y `numero_referencia`. Asegúrate de manejar posibles errores de conexión o formato."
+> "Escribe un módulo en Python usando el SDK `google-genai` (`from google import genai`). Crea una función llamada `analizar_recibo(imagen_bytes, api_key)` que reciba la imagen escaneada de un recibo como bytes y una API key opcional. Usa `genai.Client` y prueba los modelos `gemini-2.5-flash` y `gemini-1.5-flash` en ese orden (fallback). El prompt interno debe obligar al modelo a devolver ÚNICAMENTE un objeto JSON válido con las claves: `fecha_pago`, `nombre_cliente`, `monto_total`, `concepto_pago` y `numero_referencia`. Usa `response_mime_type='application/json'` en la configuración. Maneja errores de conexión, formato JSON inválido y limpieza de bloques markdown en la respuesta."
 
 ---
 
