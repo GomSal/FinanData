@@ -12,6 +12,11 @@ __pycache__/
 *.pyc
 *.pyo
 
+# Archivos swap de editores (vim/neovim)
+*.swp
+*.swo
+*~
+
 # Archivos de entorno y claves
 .env
 .env.local
