@@ -8,7 +8,7 @@ import io
 
 def analizar_recibo(imagen_bytes: bytes, api_key: str = None) -> dict:
     """
-    Analiza una imagen de un recibo utilizando el modelo Gemini 1.5 Flash / 2.5 Flash
+    Analiza una imagen de un recibo utilizando modelos Gemini (3.8 Flash / 3.5 Flash-Lite / 2.5 Flash)
     y retorna un diccionario JSON estandarizado con los campos extraídos.
     """
     api_key_to_use = api_key or os.environ.get("GEMINI_API_KEY")
@@ -30,8 +30,8 @@ def analizar_recibo(imagen_bytes: bytes, api_key: str = None) -> dict:
     }
     """
 
-    # Probar primero con modelos recomendados
-    modelos = ["gemini-2.5-flash", "gemini-1.5-flash"]
+    # Probar con modelos disponibles (del más reciente al más antiguo)
+    modelos = ["gemini-3.8-flash", "gemini-3.5-flash-lite", "gemini-2.5-flash"]
     last_error = None
 
     for model_name in modelos:
